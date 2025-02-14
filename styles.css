@@ -1,0 +1,54 @@
+/* Basic styling for the dropdown */
+.dropdown-menu {
+    display: none;  /* Ensure the dropdown is hidden by default */
+    position: absolute;
+    list-style-type: none;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+  }
+  
+  /* When aria-expanded is true, display the menu */
+  #dropdown[aria-expanded="true"] {
+    display: block;  /* Show the dropdown when it's expanded */
+  }
+  
+  .dropdown-menu li {
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .dropdown-button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  
+  .dropdown-button:focus {
+    outline: 2px solid #ffbf47;
+  }
+  
+  /* Hover style */
+  .dropdown-menu li:hover {
+    background-color: #f1f1f1;
+  }
+  
+  /* Highlight selected options */
+  .dropdown-menu li[aria-selected="true"] {
+    background-color: #007BFF;
+    color: white;
+  }
+  
+  .dropdown-menu li:focus {
+    background-color: #007BFF;
+    color: white;
+    outline: none;
+  }
+  

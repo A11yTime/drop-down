@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combobox Example</title>
+    <style>
+        /* Basic styling for the dropdown */
+        .combobox {
+            width: 200px;
+            padding: 8px;
+            font-size: 16px;
+            position: relative;
+        }
+
+        .option-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            border: 1px solid #ccc;
+            max-height: 150px;
+            overflow-y: auto;
+            position: absolute;
+            background: white;
+            width: 200px;
+            display: none;
+        }
+
+        .option-list li {
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .option-list li:hover {
+            background-color: #f0f0f0;
+        }
+
+        .option-list li.selected {
+            background-color: #dcdcdc;
+        }
+    </style>
+</head>
+<body>
+
+<div role="combobox" aria-expanded="false" aria-controls="options" aria-autocomplete="list" class="combobox">
+    <input type="text" id="combobox-input" aria-activedescendant="" autocomplete="off" placeholder="Select an option">
+    <ul id="options" role="listbox" class="option-list">
+        <li role="option" id="option1" tabindex="0">Option 1</li>
+        <li role="option" id="option2" tabindex="1">Option 2</li>
+        <li role="option" id="option3" tabindex="2">Option 3</li>
+        <li role="option" id="option4" tabindex="3">Option 4</li>
+    </ul>
+</div>
+
+<script>
+    const combobox = document.querySelector('[role="combobox"]');
+    const input = combobox.querySelector('input');
+    const optionList = combobox.querySelector('.option-list');
+    const options = optionList.querySelectorAll('[role="option"]');
+
+    // Function to update the aria-activedescendant attribute
+    function updateActiveDescendant(option) {
+        // Set the active descendant to the id of the focused option
+        combobox.setAttribute('aria-activedescendant', option.id);
+    }
+
+    // Show options when the input field is focused or the user starts typing
+    input.addEventListener('focus', () => {
+        optionList.style.display = 'block';
+        combobox.setAttribute('aria-expanded', 'true');
+    });
+
+    // Prevent closing the options on blur, only close if clicked outside the combobox
+    document.addEventListener('click', (event) => {
+        if (!combobox.contains(event.target)) {
+            optionList.style.display = 'none';
+            combobox.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    // Handle keyboard navigation (Arrow Up, Arrow Down, Enter)
+    input.addEventListener('keydown', (event) => {
+        const focusedOption = optionList.querySelector('[tabindex="0"]');
+
+        if (event.key === 'ArrowDown') {
+            // Move focus to the next option
+            const nextOption = focusedOption ? focusedOption.nextElementSibling : options[0];
+            if (nextOption) {
+                nextOption.focus();
+                nextOption.setAttribute('tabindex', '0');
+                if (focusedOption) focusedOption.setAttribute('tabindex', '-1');
+                updateActiveDescendant(nextOption);  // Update aria-activedescendant
+            }
+        } else if (event.key === 'ArrowUp') {
+            // Move focus to the previous option
+            const prevOption = focusedOption ? focusedOption.previousElementSibling : options[options.length - 1];
+            if (prevOption) {
+                prevOption.focus();
+                prevOption.setAttribute('tabindex', '0');
+                if (focusedOption) focusedOption.setAttribute('tabindex', '-1');
+                updateActiveDescendant(prevOption);  // Update aria-activedescendant
+            }
+        } else if (event.key === 'Enter' && focusedOption) {
+            // Select the focused option
+            input.value = focusedOption.textContent;
+            optionList.style.display = 'none';
+            combobox.setAttribute('aria-expanded', 'false');
+            combobox.setAttribute('aria-activedescendant', '');  // Reset active descendant when selection is made
+        } else if (event.key === 'Escape') {
+            // Close the dropdown when the Escape key is pressed
+            optionList.style.display = 'none';
+            combobox.setAttribute('aria-expanded', 'false');
+            combobox.setAttribute('aria-activedescendant', '');  // Reset active descendant
+        }
+    });
+
+    // Clicking an option will select it
+    options.forEach(option => {
+        option.addEventListener('click', () => {
+            input.value = option.textContent;
+            optionList.style.display = 'none';
+            combobox.setAttribute('aria-expanded', 'false');
+            combobox.setAttribute('aria-activedescendant', '');  // Reset active descendant
+        });
+
+        // Update the aria-activedescendant when an option is focused via mouse click
+        option.addEventListener('focus', () => {
+            updateActiveDescendant(option);
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <style>
+           /* Default style for the options */
+            .option {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            margin: 5px;
+            border: 2px solid #ccc;
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s;
+            }
+
+            /* Style for the selected option */
+            .option[aria-selected="true"] {
+            background-color: #007bff; /* Blue background for selected item */
+            color: white;              /* White text for selected item */
+            border-color: #0056b3;     /* Darker border for selected item */
+            }
+
+            /* Style for the non-selected options */
+            .option[aria-selected="false"] {
+            background-color: #f9f9f9; /* Light background for non-selected items */
+            color: #333;                /* Dark text for non-selected items */
+            border-color: #ccc;         /* Lighter border for non-selected items */
+            }
+
+            /* Checkmark style: hide by default */
+            .checkmark {
+            margin-left: 10px;         /* Space between the text and checkmark */
+            opacity: 0;                /* Make it invisible when not selected */
+            transition: opacity 0.3s ease; /* Smooth transition for checkmark */
+            }
+
+            /* When the option is selected, display the checkmark */
+            .option[aria-selected="true"] .checkmark {
+            opacity: 1;                /* Show the checkmark */
+            color: white;              /* Set checkmark color to white for contrast */
+            }
+
+            /* Hover effect */
+            .option:hover {
+            background-color: #f1f1f1;  /* Slightly darker background on hover */
+            }
+
+            /* Focus style to highlight focused item */
+            .option:focus {
+            outline: 3px solid #007bff; /* Blue outline for focused item */
+            background-color: #e0f0ff;  /* Light background color when focused */
+            }
+    </style>
+    <title>Basic</title>
+</head>
+<body>
+    <ul>
+        <li id="item1" class="option" aria-selected="false" tabindex="0">
+          <span class="option-text">Option 1</span>
+          <span class="checkmark">✔</span>
+        </li>
+        <li id="item2" class="option" aria-selected="true" tabindex="0">
+          <span class="option-text">Option 2</span>
+          <span class="checkmark">✔</span>
+        </li>
+        <li id="item3" class="option" aria-selected="false" tabindex="0">
+          <span class="option-text">Option 3</span>
+          <span class="checkmark">✔</span>
+        </li>
+      </ul>
+      
+      
+      <script>
+        // Select all option elements
+const options = document.querySelectorAll('.option');
+
+// Add click event listeners to each option
+options.forEach(option => {
+  option.addEventListener('click', () => {
+    // Get the current selected state
+    const isSelected = option.getAttribute('aria-selected') === 'true';
+    
+    // Toggle the aria-selected attribute (select or deselect)
+    option.setAttribute('aria-selected', !isSelected);
+    
+    // Optionally, you could deselect all other options here
+    options.forEach(otherOption => {
+      if (otherOption !== option) {
+        otherOption.setAttribute('aria-selected', 'false');
+      }
+    });
+  });
+});
+
+
+      </script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<p>
+    Select the enhancements for your transport capsule.
+  </p>
+  <div class="selection-container">
+    <div class="available-upgrades">
+      <span id="upgrades_label" class="dropdown-label">
+        Choose from available upgrades:
+      </span>
+      <ul id="available_upgrades_list"
+          tabindex="0"
+          role="listbox"
+          aria-labelledby="upgrades_label"
+          aria-multiselectable="true">
+        <li id="upgrade1" 
+            role="option" 
+            aria-selected="false" 
+            tabindex="-1">
+          <span class="icon-check" aria-hidden="true"></span>
+          Leather upholstery
+        </li>
+        <li id="upgrade2" 
+            role="option" 
+            aria-selected="false" 
+            tabindex="-1">
+          <span class="icon-check" aria-hidden="true"></span>
+          Heated front seats
+        </li>
+        <li id="upgrade3" 
+            role="option" 
+            aria-selected="false" 
+            tabindex="-1">
+          <span class="icon-check" aria-hidden="true"></span>
+          Premium rear seating
+        </li>
+        <li id="upgrade4" 
+            role="option" 
+            aria-selected="false" 
+            tabindex="-1">
+          <span class="icon-check" aria-hidden="true"></span>
+          Rear seat heaters
+        </li>
+        <li id="upgrade5" 
+            role="option" 
+            aria-selected="false" 
+            tabindex="-1">
+          <span class="icon-check" aria-hidden="true"></span>
+          Panoramic front roof
+        </li>
+        <li id="upgrade6" 
+            role="option" 
+            aria-selected="false" 
+            tabindex="-1">
+          <span class="icon-check" aria-hidden="true"></span>
+          Panoramic rear roof
+        </li>
+        <li id="upgrade7" 
+            role="option" 
+            aria-selected="false" 
+            tabindex="-1">
+          <span class="icon-check" aria-hidden="true"></span>
+          Stealth mode
+        </li>
+        <li id="upgrade8" 
+            role="option" 
+            aria-selected="false" 
+            tabindex="-1">
+          <span class="icon-check" aria-hidden="true"></span>
+          Automatic food generator
+        </li>
+        <li id="upgrade9" 
+            role="option" 
+            aria-selected="false" 
+            tabindex="-1">
+          <span class="icon-check" aria-hidden="true"></span>
+          Advanced waste filtration
+        </li>
+        <li id="upgrade10" 
+            role="option" 
+            aria-selected="false" 
+            tabindex="-1">
+          <span class="icon-check" aria-hidden="true"></span>
+          Vertical lift-off capability
+        </li>
+      </ul>
+      <button type="button"
+              id="add_upgrade"
+              class="button-right"
+              aria-keyshortcuts="Alt+ArrowRight Enter"
+              aria-disabled="true">
+        <span class="icon-check" aria-hidden="true"></span>
+        Add Selected
+      </button>
+    </div>
+    
+    <div class="selected-upgrades">
+      <span id="selected_upgrades_label" class="dropdown-label">
+        Your selected upgrades:
+      </span>
+      <ul id="selected_upgrades_list"
+          tabindex="0"
+          role="listbox"
+          aria-labelledby="selected_upgrades_label"
+          aria-activedescendant=""
+          aria-multiselectable="true">
+      </ul>
+      <button type="button"
+              id="remove_upgrade"
+              class="button-left"
+              aria-keyshortcuts="Alt+ArrowLeft Delete"
+              aria-disabled="true">
+        <span class="icon-check" aria-hidden="true"></span>
+        Remove Selected
+      </button>
+    </div>
+  
+    <div class="live-update">
+      Last modification:
+      <span aria-live="polite" id="live_region"></span>
+    </div>
+  </div>
+  
+  <!-- Optional Styling -->
+  <style>
+    .selection-container {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+  
+    .available-upgrades, .selected-upgrades {
+      width: 48%;
+    }
+  
+    .dropdown-label {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+      display: block;
+    }
+  
+    ul {
+      list-style-type: none;
+      padding: 0;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      margin: 0;
+    }
+  
+    li {
+      padding: 8px 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+  
+    li:hover, li:focus {
+      background-color: #f4f4f4;
+    }
+  
+    .icon-check {
+      width: 20px;
+      height: 20px;
+      background-color: #4caf50;
+      border-radius: 50%;
+      margin-right: 10px;
+      display: inline-block;
+    }
+  
+    .button-right, .button-left {
+      display: block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+    }
+  
+    .button-right:disabled, .button-left:disabled {
+      background-color: #ccc;
+    }
+  
+    .live-update {
+      display: none;
+    }
+  </style>
+  
+  <!-- Optional Script for Interactivity -->
+  <script>
+    const addButton = document.getElementById('add_upgrade');
+    const removeButton = document.getElementById('remove_upgrade');
+    const availableUpgradesList = document.getElementById('available_upgrades_list');
+    const selectedUpgradesList = document.getElementById('selected_upgrades_list');
+    const availableOptions = availableUpgradesList.querySelectorAll('li');
+    const selectedOptions = selectedUpgradesList.querySelectorAll('li');
+  
+    let currentIndex = 0; // To track the currently focused option
+  
+    // Handle Arrow Key Navigation
+    availableUpgradesList.addEventListener('keydown', function(event) {
+      if (event.key === 'ArrowDown') {
+        currentIndex = (currentIndex + 1) % availableOptions.length;
+        focusOption(currentIndex);
+      } else if (event.key === 'ArrowUp') {
+        currentIndex = (currentIndex - 1 + availableOptions.length) % availableOptions.length;
+        focusOption(currentIndex);
+      } else if (event.key === 'Enter' || event.key === ' ') {
+        toggleSelection(currentIndex);
+      }
+    });
+  
+    function focusOption(index) {
+      availableOptions.forEach((option, idx) => {
+        option.setAttribute('tabindex', idx === index ? '0' : '-1');
+        if (idx === index) option.focus();
+      });
+    }
+  
+    function toggleSelection(index) {
+      const selectedOption = availableOptions[index];
+      const isSelected = selectedOption.getAttribute('aria-selected') === 'true';
+  
+      selectedOption.setAttribute('aria-selected', !isSelected);
+      selectedOption.querySelector('.icon-check').style.backgroundColor = isSelected ? '#4caf50' : '#ff9800';
+  
+      updateButtonsState();
+    }
+  
+    // Add selected options to the right list
+    addButton.addEventListener('click', function() {
+      const selectedOptions = availableUpgradesList.querySelectorAll('[aria-selected="true"]');
+      selectedOptions.forEach(option => {
+        const clone = option.cloneNode(true);
+        selectedUpgradesList.appendChild(clone);
+        option.setAttribute('aria-selected', 'false');
+        option.querySelector('.icon-check').style.backgroundColor = '#4caf50';
+      });
+      updateButtonsState();
+    });
+  
+    // Remove selected options from the right list
+    removeButton.addEventListener('click', function() {
+      const selectedOptions = selectedUpgradesList.querySelectorAll('[aria-selected="true"]');
+      selectedOptions.forEach(option => {
+        const clone = option.cloneNode(true);
+        availableUpgradesList.appendChild(clone);
+        option.remove();
+      });
+      updateButtonsState();
+    });
+  
+    // Update button states (disabled/enabled)
+    function updateButtonsState() {
+      const anySelectedInAvailable = availableUpgradesList.querySelector('[aria-selected="true"]');
+      const anySelectedInSelected = selectedUpgradesList.querySelector('[aria-selected="true"]');
+  
+      addButton.disabled = !anySelectedInAvailable;
+      removeButton.disabled = !anySelectedInSelected;
+    }
+  
+    // Initial state of the buttons
+    updateButtonsState();
+  </script>
+  

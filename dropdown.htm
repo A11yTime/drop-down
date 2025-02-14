@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessible Multi-Select Dropdown</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li>
+        <button id="dropdownButton" aria-expanded="false" aria-controls="dropdown" class="dropdown-button">
+          Select Options
+        </button>
+        <ul id="dropdown" role="listbox" aria-labelledby="dropdownButton" class="dropdown-menu">
+          <li role="option" id="option1" aria-selected="false"><span>Option 1</span></li>
+          <li role="option" id="option2" aria-selected="false"><span>Option 2</span></li>
+          <li role="option" id="option3" aria-selected="false"><span>Option 3</span></li>
+          <li role="option" id="option4" aria-selected="false"><span>Option 4</span></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <script src="scripts.js"></script>
+</body>
+</html>

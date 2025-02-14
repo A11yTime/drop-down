@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Select Dropdown with Input</title>
+    <style>
+        /* Container for the dropdown */
+        .dropdown-container {
+            display: inline-block;
+            width: 250px;
+            position: relative;
+        }
+
+        /* Input field styling */
+        .dropdown-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        /* Group label for the dropdown */
+        .dropdown-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* Default style for the options */
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            margin: 5px 0;
+            border: 2px solid #ccc;
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Style for the selected option */
+        .option[aria-selected="true"] {
+            background-color: #007bff; /* Blue background for selected item */
+            color: white;              /* White text for selected item */
+            border-color: #0056b3;     /* Darker border for selected item */
+        }
+
+        /* Style for the non-selected options */
+        .option[aria-selected="false"] {
+            background-color: #f9f9f9; /* Light background for non-selected items */
+            color: #333;                /* Dark text for non-selected items */
+            border-color: #ccc;         /* Lighter border for non-selected items */
+        }
+
+        /* Checkmark style: hide by default */
+        .checkmark {
+            margin-left: 10px;         /* Space between the text and checkmark */
+            opacity: 0;                /* Make it invisible when not selected */
+            transition: opacity 0.3s ease; /* Smooth transition for checkmark */
+        }
+
+        /* When the option is selected, display the checkmark */
+        .option[aria-selected="true"] .checkmark {
+            opacity: 1;                /* Show the checkmark */
+            color: white;              /* Set checkmark color to white for contrast */
+        }
+
+        /* Hover effect: Only for non-selected options */
+        .option[aria-selected="false"]:hover {
+            background-color: #f1f1f1;  /* Slightly darker background on hover */
+        }
+
+        /* Focus style to highlight focused item */
+        .option:focus {
+            outline: 3px solid #007bff; /* Blue outline for focused item */
+            background-color: #e0f0ff;  /* Light background color when focused */
+        }
+
+        /* Dropdown options container */
+        .options-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            position: absolute;
+            top: 40px;
+            left: 0;
+            width: 100%;
+            border-radius: 4px;
+            box-sizing: border-box;
+            display: none; /* Hidden by default */
+            z-index: 10;
+        }
+
+        /* Display options when dropdown is open */
+        .options-list.open {
+            display: block;
+        }
+
+        /* For the dropdown container */
+        .dropdown-container.open .options-list {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dropdown-container">
+        <label for="dropdown" class="dropdown-label">Select Options</label>
+        <input type="text" id="dropdown" class="dropdown-input" placeholder="Search or select..." aria-describedby="dropdown-helper">
+        <ul role="listbox" class="options-list" id="dropdown-options">
+            <li id="item1" role="option" class="option" aria-selected="false" tabindex="0">
+                <span class="option-text">Option 1</span>
+                <span class="checkmark">✔</span>
+            </li>
+            <li id="item2" role="option" class="option" aria-selected="false" tabindex="0">
+                <span class="option-text">Option 2</span>
+                <span class="checkmark">✔</span>
+            </li>
+            <li id="item3" role="option" class="option" aria-selected="false" tabindex="0">
+                <span class="option-text">Option 3</span>
+                <span class="checkmark">✔</span>
+            </li>
+            <li id="item4" role="option" class="option" aria-selected="false" tabindex="0">
+                <span class="option-text">Option 4</span>
+                <span class="checkmark">✔</span>
+            </li>
+        </ul>
+    </div>
+
+    <script>
+        // Select elements
+        const inputField = document.getElementById('dropdown');
+        const optionsList = document.getElementById('dropdown-options');
+        const options = document.querySelectorAll('.option');
+
+        // Show dropdown options when input is focused
+        inputField.addEventListener('focus', () => {
+            optionsList.classList.add('open');
+        });
+
+        // Hide options when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.dropdown-container')) {
+                optionsList.classList.remove('open');
+            }
+        });
+
+        // Handle option selection
+        options.forEach((option) => {
+            option.addEventListener('click', () => {
+                toggleSelection(option);
+            });
+
+            option.addEventListener('keydown', (event) => {
+                const key = event.key;
+                const index = Array.from(options).indexOf(option);
+
+                switch(key) {
+                    case 'ArrowDown':
+                        // Move focus to the next option (down)
+                        if (options[index + 1]) {
+                            options[index + 1].focus();
+                        }
+                        break;
+
+                    case 'ArrowUp':
+                        // Move focus to the previous option (up)
+                        if (options[index - 1]) {
+                            options[index - 1].focus();
+                        }
+                        break;
+
+                    case 'Enter':
+                    case ' ':
+                        // Toggle selection on Enter or Spacebar
+                        toggleSelection(option);
+                        break;
+                }
+            });
+        });
+
+        // Helper function to toggle selection state
+        const toggleSelection = (option) => {
+            const isSelected = option.getAttribute('aria-selected') === 'true';
+            option.setAttribute('aria-selected', !isSelected);
+
+            // Force immediate style change using requestAnimationFrame
+            requestAnimationFrame(() => {
+                // Now the styles will apply correctly on the next frame.
+                option.offsetHeight; // Force reflow/repaint
+            });
+        };
+
+        // Filter options based on input text
+        inputField.addEventListener('input', () => {
+            const query = inputField.value.toLowerCase();
+            options.forEach(option => {
+                const text = option.querySelector('.option-text').textContent.toLowerCase();
+                option.style.display = text.includes(query) ? '' : 'none';
+            });
+        });
+    </script>
+
+</body>
+</html>

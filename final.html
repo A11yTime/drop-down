@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessible Multi-Select Dropdown</title>
+  <style>
+    /* Simple dropdown styling */
+    #dropdown {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+      background: #fff;
+      border: 1px solid #ccc;
+      max-height: 200px;
+      overflow-y: auto;
+      position: absolute;
+      width: 150px;
+      visibility: hidden;
+      opacity: 0;
+      transition: visibility 0s 0.3s, opacity 0.3s ease;
+    }
+
+    #dropdown.open {
+      visibility: visible;
+      opacity: 1;
+      transition: visibility 0s 0s, opacity 0.3s ease;
+    }
+
+    #dropdown li {
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    #dropdown li:hover,
+    #dropdown li.active-option {
+      background-color: #d3f9d8; /* Green background for active item */
+      outline: 2px solid #333; /* Visible outline for active focus */
+    }
+
+    #dropdown li[aria-selected="true"] {
+      background-color: #cce5ff; /* Highlight selected options */
+    }
+  </style>
+</head>
+<body>
+  <button id="dropdownButton" aria-expanded="false" aria-controls="dropdown" aria-activedescendant="">
+    Select Options
+  </button>
+  <ul id="dropdown" role="listbox" aria-labelledby="dropdownButton">
+    <li id="option1" role="option" tabindex="-1" aria-selected="false">Option 1</li>
+    <li id="option2" role="option" tabindex="-1" aria-selected="false">Option 2</li>
+    <li id="option3" role="option" tabindex="-1" aria-selected="false">Option 3</li>
+    <li id="option4" role="option" tabindex="-1" aria-selected="false">Option 4</li>
+  </ul>
+
+  <script>
+    // Access the button and menu
+    const dropdownButton = document.getElementById('dropdownButton');
+    const dropdownMenu = document.getElementById('dropdown');
+    const options = Array.from(dropdownMenu.querySelectorAll('li'));
+
+    let currentIndex = -1;  // Track the currently focused option (-1 means no option focused initially)
+    let isDropdownOpen = false;  // Track whether the dropdown is open
+
+    // Toggle dropdown visibility on button click or key press
+    dropdownButton.addEventListener('click', toggleDropdown);
+    dropdownButton.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault(); // Prevent default behavior (like scrolling on Spacebar)
+        toggleDropdown();
+      }
+    });
+
+    // Toggle the dropdown state and update aria-expanded
+    function toggleDropdown() {
+      if (isDropdownOpen) {
+        closeDropdown();
+      } else {
+        openDropdown();
+      }
+    }
+
+    function openDropdown() {
+      dropdownMenu.setAttribute('aria-expanded', 'true');
+      dropdownButton.setAttribute('aria-activedescendant', ''); // No option is selected initially
+      dropdownMenu.classList.add('open');
+      isDropdownOpen = true;
+      currentIndex = -1; // No option is focused when dropdown opens
+      resetSelection();  // Ensure no option is selected
+      dropdownButton.focus();  // Keep focus on the button
+    }
+
+    function closeDropdown() {
+      dropdownMenu.setAttribute('aria-expanded', 'false');
+      dropdownMenu.classList.remove('open');
+      dropdownButton.setAttribute('aria-activedescendant', '');  // Clear aria-activedescendant
+      isDropdownOpen = false;
+    }
+
+    // Close the dropdown when clicking outside of it
+    document.addEventListener('click', (event) => {
+      if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+        closeDropdown();
+      }
+    });
+
+    // Allow keyboard navigation in the dropdown
+    dropdownButton.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        focusNextOption();
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        focusPrevOption();
+      } else if (event.key === 'Escape') {
+        closeDropdown();
+        dropdownButton.focus();
+      } else if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        if (isDropdownOpen && currentIndex >= 0) {
+          toggleSelection();  // Select the currently focused option
+        } else {
+          openDropdown(); // Open dropdown if closed
+        }
+      }
+    });
+
+    // Focus the next option
+    function focusNextOption() {
+      currentIndex = (currentIndex + 1) % options.length;  // Wrap around to the first option
+      updateActivedescendant();
+    }
+
+    // Focus the previous option
+    function focusPrevOption() {
+      currentIndex = (currentIndex - 1 + options.length) % options.length;  // Wrap around to the last option
+      updateActivedescendant();
+    }
+
+    // Update the aria-activedescendant attribute and add/remove focus style
+    function updateActivedescendant() {
+      // Remove the active focus class from all options
+      options.forEach(option => option.classList.remove('active-option'));
+      
+      // Add the active focus class to the current option
+      if (currentIndex >= 0 && currentIndex < options.length) {
+        const currentOption = options[currentIndex];
+        currentOption.classList.add('active-option');
+        dropdownButton.setAttribute('aria-activedescendant', currentOption.id);
+      }
+    }
+
+    // Reset selection state (when dropdown is opened or reset)
+    function resetSelection() {
+      options.forEach(option => {
+        option.setAttribute('aria-selected', 'false'); // Ensure no options are selected
+      });
+      updateButtonText();
+    }
+
+    // Toggle selection for the currently focused option
+    function toggleSelection() {
+      if (currentIndex >= 0 && currentIndex < options.length) {
+        const currentOption = options[currentIndex];
+        const isSelected = currentOption.getAttribute('aria-selected') === 'true';
+        currentOption.setAttribute('aria-selected', !isSelected);
+        updateButtonText();
+      }
+    }
+
+    // Update the dropdown button text with selected options
+    function updateButtonText() {
+      const selectedOptions = options.filter(option => option.getAttribute('aria-selected') === 'true')
+        .map(option => option.textContent.trim());
+      if (selectedOptions.length > 0) {
+        dropdownButton.textContent = selectedOptions.join(', ');
+      } else {
+        dropdownButton.textContent = 'Select Options';
+      }
+    }
+
+    // Allow mouse click to toggle selection (same as keyboard behavior)
+    dropdownMenu.addEventListener('click', (event) => {
+      const option = event.target.closest('li');
+      if (option && option.getAttribute('role') === 'option') {
+        const isSelected = option.getAttribute('aria-selected') === 'true';
+        option.setAttribute('aria-selected', !isSelected);
+        updateButtonText();
+      }
+    });
+  </script>
+</body>
+</html>
