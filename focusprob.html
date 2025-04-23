@@ -262,36 +262,42 @@
       }
 
       toggleList(show) {
-        this.isOpen = show;
-        this.container.classList.toggle('open', show);
-        this.input.setAttribute('aria-expanded', show);
-        if (show) {
-          this.tempSelected = new Set(this.selected);
-        }
-        this.setActive(this.activeIndex);
-      }
+  this.isOpen = show;
+  this.container.classList.toggle('open', show);
+  this.input.setAttribute('aria-expanded', show);
+  if (show) {
+    this.tempSelected = new Set(this.selected);
+    this.input.focus(); // make sure input gets focus when list opens
+    this.setActive(this.activeIndex); // highlight current
+  } else {
+    this.input.removeAttribute('aria-activedescendant');
+  }
+}
+
 
       setActive(index) {
-        const options = this.list.querySelectorAll('.fruitbox-option');
+  const options = this.list.querySelectorAll('.fruitbox-option');
 
-        if(this.lastActiveIndex !=null && options[this.lastActiveIndex]){
-          options[this.lastActiveIndex].classList.remove('option-active')
-        }
-  
-        if (index < 0 || index >= options.length) return;
-        options.forEach((opt) => opt.classList.remove('option-active'));
-        options[index].classList.add('option-active');
-       
-        const input = options[index].querySelector('input[type="checkbox"]');
-        if(input) {
-            this.input.setAttribute('aira-activedescendant', input.id);
-            input.scrollIntoView({block: 'nearest'})
-            this.activeIndex = index;
-            input.focus()
-        }
-       
-        this.lastActiveIndex = index;
-      }
+  if (this.lastActiveIndex != null && options[this.lastActiveIndex]) {
+    options[this.lastActiveIndex].classList.remove('option-active');
+  }
+
+  if (index < 0 || index >= options.length) return;
+
+  options.forEach((opt) => opt.classList.remove('option-active'));
+  const option = options[index];
+  option.classList.add('option-active');
+
+  const input = option.querySelector('input[type="checkbox"]');
+  if (input) {
+    this.input.setAttribute('aria-activedescendant', input.id);
+    option.scrollIntoView({ block: 'nearest' });
+  }
+
+  this.activeIndex = index;
+  this.lastActiveIndex = index;
+}
+
 
       setHoverIndex(index) {
         const options = this.list.querySelectorAll('.fruitbox-option');
